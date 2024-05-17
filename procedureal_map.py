@@ -1,7 +1,35 @@
-import random                                                             from rich.segment import Segment                                          from rich.style import Style                                              from textual.app import App, ComposeResult
-from textual.strip import Strip                                           from textual.widget import Widget                                         from queue import PriorityQueue                                           import math                                                                                                                                                                                                                   class MapWidget(Widget):                                                      """Render a procedurally generated 2D RPG map."""                                                                                                   def __init__(self, width: int, height: int, num_villages: int) -> None:                                                                                 super().__init__()                                                        self.map_width = width                                                    self.map_height = height
-        self.num_villages = num_villages                                          self.map_data = self.generate_map(width, height, num_villages)                                                                                  def generate_map(self, width: int, height: int, num_villages: int):           """Generate a random map with land, water, forest, villages, and roads."""                                                                          map_data = [["."] * width for _ in range(height)]                                                                                                   # Place water
-        self.place_water(map_data)                                                                                                                          # Place forest                                                            self.place_forest(map_data)                                                                                                                         # Place villages                                                          villages = self.place_villages(width, height, num_villages, map_data)
+import random
+from rich.segment import Segment
+from rich.style import Style
+from textual.app import App, ComposeResult
+from textual.strip import Strip
+from textual.widget import Widget
+from queue import PriorityQueue
+import math
+
+
+class MapWidget(Widget):
+    """Render a procedurally generated 2D RPG map."""
+
+    def __init__(self, width: int, height: int, num_villages: int) -> None:
+        super().__init__()
+        self.map_width = width
+        self.map_height = height
+        self.num_villages = num_villages
+        self.map_data = self.generate_map(width, height, num_villages)
+
+    def generate_map(self, width: int, height: int, num_villages: int):
+        """Generate a random map with land, water, forest, villages, and roads."""
+        map_data = [["."] * width for _ in range(height)]
+
+        # Place water
+        self.place_water(map_data)
+
+        # Place forest
+        self.place_forest(map_data)
+
+        # Place villages
+        villages = self.place_villages(width, height, num_villages, map_data)
 
         # Connect villages with roads
         self.connect_villages(villages, map_data)
@@ -49,7 +77,7 @@ from textual.strip import Strip                                           from t
         open_set.put((0, start))
         came_from = {}
         g_score = {start: 0}
-
+        
         while not open_set.empty():
             current_cost, current = open_set.get()
             if current == end:
